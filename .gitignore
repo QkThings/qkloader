@@ -1,0 +1,17 @@
+*.pro.user*
+*Makefile*
+*Makefile.Debug*
+*Makefile.Release*
+/build
+/release
+/debug
+qkloadergui/build
+qkloadergui/release
+qkloadergui/debug
+*object_script*
+*.*~
+*~
+*.dll
+*.a
+*.o
+*.d

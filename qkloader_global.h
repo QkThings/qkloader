@@ -1,0 +1,12 @@
+#ifndef QKLOADER_GLOBAL_H
+#define QKLOADER_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(QKLOADER_LIBRARY)
+#  define QKLOADERSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define QKLOADERSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // QKLOADER_GLOBAL_H
