@@ -43,6 +43,10 @@ public slots:
 private:
     XMODEM *m_xmodem;
 
+    bool waitForData(int timeout);
+    bool waitForChipID();
+    bool waitForReady();
+
 };
 
 #endif // QKLOADER_H

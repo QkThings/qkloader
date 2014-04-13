@@ -19,12 +19,10 @@ QMAKE_LIBDIR += ../release
 
 SOURCES += main.cpp\
         qkloadergui.cpp \
-    ../../utils/qkutils.cpp \
-    ../xmodem.cpp
+    ../../utils/qkutils.cpp
 
 HEADERS  += qkloadergui.h \
-    ../../utils/qkutils.h \
-    ../xmodem.h
+    ../../utils/qkutils.h
 
 FORMS    += qkloadergui.ui
 

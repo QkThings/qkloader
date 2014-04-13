@@ -4,8 +4,6 @@
 #include "qkloader.h"
 #include "qkutils.h"
 
-#include "xmodem.h"
-
 #include <QDebug>
 #include <QSerialPort>
 #include <QSerialPortInfo>
@@ -20,6 +18,7 @@ QkLoaderGUI::QkLoaderGUI(QWidget *parent) :
     ui(new Ui::QkLoaderGUI)
 {
     ui->setupUi(this);
+    ui->textLog->setFont(QFont("Courier New", 9));
 
     serialPort = new QSerialPort(this);
 
@@ -134,56 +133,18 @@ void QkLoaderGUI::slotSendASCII()
 }
 
 void QkLoaderGUI::slotUpload()
-{
-
-    disconnect(serialPort, SIGNAL(readyRead()), this, SLOT(slotDataReady()));
+{   
+    QString targetName = ui->comboTargetName->currentText();
 
     log(tr("Uploading..."));
 
-    XMODEM xmodem(serialPort);
+    disconnect(serialPort, SIGNAL(readyRead()), this, SLOT(slotDataReady()));
 
-    connect(&xmodem, SIGNAL(output(QString)), this, SLOT(log(QString)));
-    xmodem.sendFile(ui->lineFile->text());
-
+    QkLoaderEFM32 efm32_loader(serialPort, this);
+    connect(&efm32_loader, SIGNAL(output(QString)), this, SLOT(log(QString)));
+    efm32_loader.upload(ui->lineFile->text());
 
     connect(serialPort, SIGNAL(readyRead()), this, SLOT(slotDataReady()));
-
-//    QkLoaderEFM32 efm32_loader(sp, this);
-
-//    QString targetName = ui->comboTargetName->currentText();
-//    if(targetName == "EFM32")
-//        loader = &efm32_loader;
-
-//    QString filePath = ui->lineFile->text();
-//    QSerialPort *sp = serialPort;
-
-//    sp->setPortName(ui->comboPort->currentText());
-//    if(sp->open(QSerialPort::ReadWrite))
-//    {
-//        sp->setBaudRate(115200);
-//        sp->setDataBits(QSerialPort::Data8);
-//        sp->setParity(QSerialPort::NoParity);
-//        sp->setStopBits(QSerialPort::OneStop);
-//        sp->setFlowControl(QSerialPort::NoFlowControl);
-
-//        log(tr("Connected"));
-//        log(tr("Uploading..."));
-
-//        QkLoaderEFM32 efm32_loader(sp, this);
-
-//        QString targetName = ui->comboTargetName->currentText();
-//        if(targetName == "EFM32")
-//            loader = &efm32_loader;
-
-//        connect(loader, SIGNAL(output(QString)), this, SLOT(log(QString)));
-//        loader->upload(filePath);
-//    }
-//    else
-//    {
-//        QString errMsg = tr("Failed to open port. ") + sp->errorString();
-//        log(errMsg);
-//        return;
-//    }
 }
 
 void QkLoaderGUI::updateInterface()
