@@ -8,6 +8,9 @@
 qkloadergui/build
 qkloadergui/release
 qkloadergui/debug
+efm32_loader/build
+efm32_loader/release
+efm32_loader/debug
 *object_script*
 *.*~
 *~
