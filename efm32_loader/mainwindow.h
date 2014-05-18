@@ -8,6 +8,7 @@ class MainWindow;
 }
 
 class EFM32Loader;
+class QSerialPort;
 
 class MainWindow : public QMainWindow
 {
@@ -22,6 +23,8 @@ private slots:
     void slotBrowse();
     void slotUpload();
     void slotConnect();
+    void slotSendASCII();
+    void slotDataReady();
     void log(const QString &text);
     void updateInterface();
 
@@ -29,6 +32,7 @@ private:
     Ui::MainWindow *ui;
 
     EFM32Loader *loader;
+    QSerialPort *serialPort;
     bool m_connected;
 
     void readSettings();

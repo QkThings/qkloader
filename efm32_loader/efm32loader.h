@@ -12,7 +12,7 @@ class EFM32Loader : public QObject
 public:
     explicit EFM32Loader(QObject *parent = 0);
 
-
+    QSerialPort *serialPort() { return m_serialPort; }
 
 signals:
     void output(QString);

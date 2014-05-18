@@ -88,6 +88,9 @@
     <item>
      <widget class="QPlainTextEdit" name="textLog"/>
     </item>
+    <item>
+     <widget class="QLineEdit" name="lineASCII"/>
+    </item>
    </layout>
   </widget>
  </widget>
