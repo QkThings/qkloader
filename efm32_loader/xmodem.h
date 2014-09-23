@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef XMODEM_H
+#define XMODEM_H
+
 #include <QObject>
 
 class QSerialPort;

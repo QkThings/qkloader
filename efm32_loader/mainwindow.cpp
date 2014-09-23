@@ -16,6 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include "efm32loader.h"
@@ -42,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(serialPort, SIGNAL(readyRead()), this, SLOT(slotDataReady()));
     connect(ui->buttonReload, SIGNAL(clicked()), this, SLOT(slotReloadSerialPorts()));
     connect(ui->buttonBrowse, SIGNAL(clicked()), this, SLOT(slotBrowse()));
+    connect(ui->buttonDetect, SIGNAL(clicked()), this, SLOT(slotDetect()));
     connect(ui->buttonUpload, SIGNAL(clicked()), this, SLOT(slotUpload()));
     connect(ui->buttonConnect, SIGNAL(clicked()), this, SLOT(slotConnect()));
 
@@ -104,6 +107,13 @@ void MainWindow::slotConnect()
         m_connected = false;
     }
     updateInterface();
+}
+
+void MainWindow::slotDetect()
+{
+    disconnect(serialPort, SIGNAL(readyRead()), this, SLOT(slotDataReady()));
+    loader->detect();
+    connect(serialPort, SIGNAL(readyRead()), this, SLOT(slotDataReady()));
 }
 
 void MainWindow::slotUpload()

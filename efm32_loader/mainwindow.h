@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
 #include <QMainWindow>
 
 namespace Ui {
@@ -37,6 +40,7 @@ public:
 private slots:
     void slotReloadSerialPorts();
     void slotBrowse();
+    void slotDetect();
     void slotUpload();
     void slotConnect();
     void slotSendASCII();

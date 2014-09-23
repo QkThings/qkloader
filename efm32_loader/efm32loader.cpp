@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "efm32loader.h"
 #include "xmodem.h"
 
 #include <QSerialPort>
@@ -73,6 +74,23 @@ void EFM32Loader::close()
     m_serialPort->close();
 }
 
+bool EFM32Loader::detect()
+{
+    char byteBuf;
+
+    m_serialPort->readAll();
+    enterBoot();
+
+    byteBuf = 'U';
+    m_serialPort->write(&byteBuf, 1);
+    bool detected = waitForChipID();
+
+    m_serialPort->readAll();
+    exitBoot();
+
+    return detected;
+}
+
 bool EFM32Loader::upload(const QString &filePath)
 {
     QFile file(filePath);
@@ -122,7 +140,7 @@ void EFM32Loader::enterBoot()
 
     connect(&timer, SIGNAL(timeout()), &eventLoop, SLOT(quit()));
 
-    m_serialPort->setDataTerminalReady(false);
+    m_serialPort->setDataTerminalReady(true);
     timer.start(100);
     eventLoop.exec();
 
@@ -131,7 +149,7 @@ void EFM32Loader::enterBoot()
 
 void EFM32Loader::exitBoot()
 {
-    m_serialPort->setDataTerminalReady(true);
+    m_serialPort->setDataTerminalReady(false);
     reset();
 }
 
@@ -154,7 +172,7 @@ bool EFM32Loader::waitForChipID()
 {
     while(1)
     {
-        if(!waitForData(2000))
+        if(!waitForData(3000))
         {
             emit output("Unable to receive ChipID");
             return false;

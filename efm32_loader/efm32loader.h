@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef EFM32LOADER_H
+#define EFM32LOADER_H
+
 #include <QObject>
 
 class QSerialPort;
@@ -36,6 +39,7 @@ signals:
 public slots:
     bool open(const QString &portName);
     void close();
+    bool detect();
     bool upload(const QString &filePath);
 
 private:

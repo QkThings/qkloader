@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef CLHANDLER_H
+#define CLHANDLER_H
+
 #include <QObject>
 #include "efm32loader.h"
 

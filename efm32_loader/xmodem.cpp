@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- * XMODEM-CRC implementation following this specification:
+
+/*
+ * XMODEM-CRC implementation according to:
  * http://web.mit.edu/6.115/www/miscfiles/amulet/amulet-help/xmodem.htm
  */
 

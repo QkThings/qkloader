@@ -79,6 +79,13 @@
      </layout>
     </item>
     <item>
+     <widget class="QPushButton" name="buttonDetect">
+      <property name="text">
+       <string>Detect</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="buttonUpload">
       <property name="text">
        <string>Upload</string>
