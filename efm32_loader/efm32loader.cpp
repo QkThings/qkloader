@@ -43,8 +43,8 @@ bool EFM32Loader::open(const QString &portName)
         sp->setPortName(portName);
         if(sp->open(QSerialPort::ReadWrite))
         {
-            //sp->setBaudRate(115200);
-            sp->setBaudRate(450000);
+            sp->setBaudRate(115200);
+//            sp->setBaudRate(450000);
             sp->setDataBits(QSerialPort::Data8);
             sp->setParity(QSerialPort::NoParity);
             sp->setStopBits(QSerialPort::OneStop);
