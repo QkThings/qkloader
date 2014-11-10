@@ -18,9 +18,15 @@
  */
 
 #include "mainwindow.h"
+
+#ifdef EFM32_LOADER_GUI
 #include <QApplication>
 #include <QStyle>
 #include <QStyleFactory>
+#else
+#include <QCoreApplication>
+#endif
+
 #include <QSettings>
 #include <QDebug>
 #include <QTimer>
@@ -30,36 +36,48 @@
 
 int main(int argc, char *argv[])
 {
+#ifdef EFM32_LOADER_GUI
     QApplication a(argc, argv);
-
     QStyle *style = QStyleFactory::create("Fusion");
     a.setStyle(style);
+#else
+    QCoreApplication a(argc, argv);
+#endif
+
     a.setOrganizationDomain("settings");
     a.setApplicationName("EFM32 Loader");
 
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, a.applicationDirPath());
     QSettings::setDefaultFormat(QSettings::IniFormat);
 
-    CLHandler handler;
+#ifdef EFM32_LOADER_GUI
     MainWindow w;
+    w.show();
+#else
+    CLHandler handler;
 
-    if(argc > 1)
+    if(argc != 4)
     {
-        if(argc != 3)
-        {
-            std::cout << "Wrong number of arguments." << std::endl;
-            std::cout << "Usage: efm32_loader <port_name> <file_path>" << std::endl;
-            exit(EXIT_FAILURE);
-        }
-        handler.portName = QString(argv[1]);
-        handler.filePath = QString(argv[2]);
-        QObject::connect(&handler, SIGNAL(done()), &a, SLOT(quit()));
-        QTimer::singleShot(0, &handler, SLOT(run()));
+        std::cout << "Wrong number of arguments." << std::endl;
+        std::cout << "Usage: efm32_loader <port_name> <file_path> <boot_pol>" << std::endl;
+        exit(EXIT_FAILURE);
     }
-    else
+
+    handler.portName = QString(argv[1]);
+    handler.filePath = QString(argv[2]);
+    handler.bootPol = QString(argv[3]);
+
+    if(handler.bootPol != "0" && handler.bootPol != "1")
     {
-        w.show();
+        std::cout << "ERROR: <boot_pol> must be 0 or 1" << std::endl;
+        std::cout << "Usage: efm32_loader <port_name> <file_path> <boot_pol>" << std::endl;
+        exit(EXIT_FAILURE);
     }
+
+    QObject::connect(&handler, SIGNAL(done()), &a, SLOT(quit()));
+    QTimer::singleShot(0, &handler, SLOT(run()));
+
+#endif
 
     return a.exec();
 }

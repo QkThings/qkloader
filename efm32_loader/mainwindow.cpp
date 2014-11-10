@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef EFM32_LOADER_GUI
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -119,6 +121,10 @@ void MainWindow::slotDetect()
 void MainWindow::slotUpload()
 {
     disconnect(serialPort, SIGNAL(readyRead()), this, SLOT(slotDataReady()));
+    if(ui->comboBootEnPol->currentText() == "HIGH")
+        loader->setBootEnablePolarity(true);
+    else
+        loader->setBootEnablePolarity(false);
     loader->upload(ui->lineFile->text());
     connect(serialPort, SIGNAL(readyRead()), this, SLOT(slotDataReady()));
 }
@@ -147,3 +153,5 @@ void MainWindow::updateInterface()
 
     ui->comboPort->setEnabled(!m_connected);
 }
+
+#endif //EFM32_LOADER_GUI

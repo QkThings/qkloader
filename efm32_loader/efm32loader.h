@@ -32,6 +32,7 @@ public:
     explicit EFM32Loader(QObject *parent = 0);
 
     QSerialPort *serialPort() { return m_serialPort; }
+    void setBootEnablePolarity(bool high);
 
 signals:
     void output(QString);
@@ -45,6 +46,7 @@ public slots:
 private:
     QSerialPort *m_serialPort;
     XMODEM *m_xmodem;
+    bool _bootEnablePolarity;
 
     bool waitForChipID();
     bool waitForReady();

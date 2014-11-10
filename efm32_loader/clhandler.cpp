@@ -25,6 +25,10 @@ void CLHandler::run()
     connect(&loader, SIGNAL(output(QString)), this, SLOT(log(QString)));
 
     std::cout << "> Connecting to port " << portName.toStdString();
+    if(bootPol == "1")
+        loader.setBootEnablePolarity(true);
+    else
+        loader.setBootEnablePolarity(false);
     if(loader.open(portName))
        loader.upload(filePath);
 

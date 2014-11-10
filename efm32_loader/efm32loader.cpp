@@ -31,7 +31,13 @@ EFM32Loader::EFM32Loader(QObject *parent) :
 {
     m_serialPort = new QSerialPort(this);
     m_xmodem = new XMODEM(m_serialPort, this);
+    _bootEnablePolarity = true;
     connect(m_xmodem, SIGNAL(output(QString)), this, SIGNAL(output(QString)));
+}
+
+void EFM32Loader::setBootEnablePolarity(bool high)
+{
+    _bootEnablePolarity = high;
 }
 
 bool EFM32Loader::open(const QString &portName)
@@ -113,7 +119,11 @@ bool EFM32Loader::upload(const QString &filePath)
     // Autobaud sync
     byteBuf = 'U';
     m_serialPort->write(&byteBuf, 1);
-    waitForChipID();
+    if(!waitForChipID())
+    {
+        exitBoot();
+        return false;
+    }
 
     // Enter upload mode (XMODEM)
     byteBuf = 'u';
@@ -140,7 +150,10 @@ void EFM32Loader::enterBoot()
 
     connect(&timer, SIGNAL(timeout()), &eventLoop, SLOT(quit()));
 
-    m_serialPort->setDataTerminalReady(true);
+    if(_bootEnablePolarity == true)
+        m_serialPort->setDataTerminalReady(false);
+    else
+        m_serialPort->setDataTerminalReady(true);
     timer.start(100);
     eventLoop.exec();
 
@@ -149,7 +162,10 @@ void EFM32Loader::enterBoot()
 
 void EFM32Loader::exitBoot()
 {
-    m_serialPort->setDataTerminalReady(false);
+    if(_bootEnablePolarity == true)
+        m_serialPort->setDataTerminalReady(true);
+    else
+        m_serialPort->setDataTerminalReady(false);
     reset();
 }
 

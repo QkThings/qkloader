@@ -20,6 +20,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#ifdef EFM32_LOADER_GUI
 #include <QMainWindow>
 
 namespace Ui {
@@ -57,5 +58,7 @@ private:
 
     void readSettings();
 };
+
+#endif // EFM32_LOADER_GUI
 
 #endif // MAINWINDOW_H
