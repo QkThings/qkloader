@@ -20,6 +20,7 @@
 #include "efm32loader.h"
 #include "xmodem.h"
 
+#include <QDebug>
 #include <QSerialPort>
 #include <QEventLoop>
 #include <QTimer>
@@ -84,7 +85,7 @@ bool EFM32Loader::detect()
 {
     char byteBuf;
 
-    m_serialPort->readAll();
+//    m_serialPort->readAll();
     enterBoot();
 
     byteBuf = 'U';
@@ -111,14 +112,25 @@ bool EFM32Loader::upload(const QString &filePath)
 
     QElapsedTimer elapsedTimer;
 
-    m_serialPort->readAll();
     enterBoot();
 
     elapsedTimer.start();
 
     // Autobaud sync
     byteBuf = 'U';
-    m_serialPort->write(&byteBuf, 1);
+    int tries = 3;
+    QEventLoop eventLoop;
+    QTimer timer;
+    timer.setInterval(5);
+    timer.setSingleShot(false);
+    connect(&timer, SIGNAL(timeout()), &eventLoop, SLOT(quit()));
+    timer.start();
+    while(tries--)
+    {
+        m_serialPort->write(&byteBuf, 1);
+        eventLoop.exec();
+    }
+
     if(!waitForChipID())
     {
         exitBoot();
@@ -129,6 +141,8 @@ bool EFM32Loader::upload(const QString &filePath)
     byteBuf = 'u';
     m_serialPort->write(&byteBuf, 1);
     waitForReady();
+
+    emit output("Uploading...");
 
     // Send file through XMODEM-CRC protocol
     success = m_xmodem->sendFile(filePath);
@@ -147,14 +161,13 @@ void EFM32Loader::enterBoot()
     QEventLoop eventLoop;
     QTimer timer;
     timer.setSingleShot(true);
-
     connect(&timer, SIGNAL(timeout()), &eventLoop, SLOT(quit()));
 
     if(_bootEnablePolarity == true)
         m_serialPort->setDataTerminalReady(false);
     else
         m_serialPort->setDataTerminalReady(true);
-    timer.start(100);
+    timer.start(10);
     eventLoop.exec();
 
     reset();
@@ -162,10 +175,17 @@ void EFM32Loader::enterBoot()
 
 void EFM32Loader::exitBoot()
 {
+    QEventLoop eventLoop;
+    QTimer timer;
+    timer.setSingleShot(true);
+    connect(&timer, SIGNAL(timeout()), &eventLoop, SLOT(quit()));
+
     if(_bootEnablePolarity == true)
         m_serialPort->setDataTerminalReady(true);
     else
         m_serialPort->setDataTerminalReady(false);
+    timer.start(10);
+    eventLoop.exec();
     reset();
 }
 
@@ -186,11 +206,12 @@ void EFM32Loader::reset()
 
 bool EFM32Loader::waitForChipID()
 {
+    emit output("Waiting for chip ID");
     while(1)
     {
         if(!waitForData(3000))
         {
-            emit output("Unable to receive ChipID");
+            emit output("Unable to receive chip ID");
             return false;
         }
         else
@@ -209,7 +230,7 @@ bool EFM32Loader::waitForReady()
 {
     while(1)
     {
-        if(!waitForData(2000))
+        if(!waitForData(3500))
         {
             emit output("Unable to receive 'C'");
             return false;
@@ -234,8 +255,8 @@ bool EFM32Loader::waitForData(int timeout)
     timer.setInterval(timeout);
     timer.setSingleShot(true);
 
-    connect(&timer, SIGNAL(timeout()), &eventLoop, SLOT(quit()));
     connect(m_serialPort, SIGNAL(readyRead()), &eventLoop, SLOT(quit()));
+    connect(&timer, SIGNAL(timeout()), &eventLoop, SLOT(quit()));
 
     if(m_serialPort->bytesAvailable() > 0)
         return true;
@@ -243,7 +264,7 @@ bool EFM32Loader::waitForData(int timeout)
     {
         timer.start();
         eventLoop.exec();
-        return (timer.remainingTime() > 0);
+        return (m_serialPort->bytesAvailable() > 0);
     }
 }
 

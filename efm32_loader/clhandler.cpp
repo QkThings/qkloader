@@ -18,13 +18,17 @@
  */
 
 #include "clhandler.h"
-#include <iostream>
+#include <QTextStream>
+
+QTextStream cout(stdout, QIODevice::WriteOnly);
 
 void CLHandler::run()
 {
     connect(&loader, SIGNAL(output(QString)), this, SLOT(log(QString)));
 
-    std::cout << "> Connecting to port " << portName.toStdString();
+    cout << "> Connecting to port " << portName;
+    cout.flush();
+
     if(bootPol == "1")
         loader.setBootEnablePolarity(true);
     else
@@ -32,22 +36,27 @@ void CLHandler::run()
     if(loader.open(portName))
        loader.upload(filePath);
 
-    std::cout << std::endl;
+    cout << "\n";
+    cout.flush();
+
     emit done();
 }
 
 void CLHandler::log(const QString &message)
 {
-    static bool firstProgress = true;
+    static bool firstPercent = true;
     if(message.contains("/"))
     {
-        if(firstProgress)
+        if(firstPercent)
         {
-            std::cout << std::endl;
-            firstProgress = false;
+            cout << "\n";
+            firstPercent = false;
         }
-        std::cout << message.toStdString() << "\r";
+        cout << message << "\r";
+
     }
     else
-        std::cout << "\n> " << message.toStdString();
+        cout << "\n> " << message;
+
+    cout.flush();
 }
